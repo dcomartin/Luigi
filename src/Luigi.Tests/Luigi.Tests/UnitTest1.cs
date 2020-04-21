@@ -9,14 +9,15 @@ namespace TestProject1
 {
     public class UnitTest1
     {
-        private readonly ServiceProvider _serviceProvider;
+        private readonly IDispatcher _dispatcher;
 
         public UnitTest1()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLuigi(GetType().Assembly);
             
-            _serviceProvider = serviceCollection.BuildServiceProvider();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            _dispatcher = serviceProvider.GetRequiredService<IDispatcher>();
         }
         
         [Fact]
@@ -50,71 +51,15 @@ namespace TestProject1
         [Fact]
         public async Task Returns_response_from_PipelineContext()
         {
-           var dispatcher = new Dispatcher(_serviceProvider);
-           var response = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest());
+           var response = await _dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest());
            response.ShouldBe("Hello World");
         }
         
         [Fact]
         public async Task Short_Circuit()
         { 
-            var dispatcher = new Dispatcher(_serviceProvider);
-            var response = await dispatcher.Dispatch<ShortCircuitRequest, string>(new ShortCircuitRequest());
+            var response = await _dispatcher.Dispatch<ShortCircuitRequest, string>(new ShortCircuitRequest());
             response.ShouldBe("Short Circuit");
-        }
-    }
-    
-    public class HelloWorldRequest 
-    {
-        
-    }
-    
-    public class HelloWorldPipeline : IPipeline<HelloWorldRequest, string>
-    {
-        public void Configure(IPipelineBuilder<HelloWorldRequest, string> builder)
-        {
-            builder.UsePipe<HelloWorldPipe>();
-        }
-    }
-    
-    public class HelloWorldPipe : IPipe<HelloWorldRequest, string>
-    {
-        public async Task Handle(PipelineContext<HelloWorldRequest, string> pipelineContext, Func<PipelineContext<HelloWorldRequest, string>, Task> next)
-        {
-            pipelineContext.Response = "Hello World";
-            await next(pipelineContext);
-        }
-    }
-    
-    public class ShortCircuitRequest
-    {
-        
-    }
-    
-    public class ShortCircuitPipeline : IPipeline<ShortCircuitRequest, string>
-    {
-        public void Configure(IPipelineBuilder<ShortCircuitRequest, string> builder)
-        {
-            builder.UsePipe<ShortCircuitPipe>();
-            builder.UsePipe<ShortCircuitNonReachablePipe>();
-        }
-    }
-    
-    public class ShortCircuitPipe : IPipe<ShortCircuitRequest, string>
-    {
-        public Task Handle(PipelineContext<ShortCircuitRequest, string> pipelineContext, Func<PipelineContext<ShortCircuitRequest, string>, Task> next)
-        {
-            pipelineContext.Response = "Short Circuit";
-            return Task.CompletedTask;
-        }
-    }
-    
-    public class ShortCircuitNonReachablePipe : IPipe<ShortCircuitRequest, string>
-    {
-        public Task Handle(PipelineContext<ShortCircuitRequest, string> pipelineContext, Func<PipelineContext<ShortCircuitRequest, string>, Task> next)
-        {
-            pipelineContext.Response = "Non Reachable Pipe";
-            return Task.CompletedTask;
         }
     }
 }

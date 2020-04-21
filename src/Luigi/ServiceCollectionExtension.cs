@@ -8,20 +8,22 @@ namespace Luigi
     {
         public static void AddLuigi(this IServiceCollection serviceCollection, params Assembly[] assemblies)
         {
+            serviceCollection.AddTransient<IDispatcher, Dispatcher>();
+            
             serviceCollection.Scan(scan =>
             {
                 if (assemblies?.Length > 0)
                 {
-                    scan.FromAssemblies(assemblies).AddLugiTypes();
+                    scan.FromAssemblies(assemblies).AddLuigiTypes();
                 }
                 else
                 {
-                    scan.FromCallingAssembly().AddLugiTypes();
+                    scan.FromCallingAssembly().AddLuigiTypes();
                 }
             });
         }
 
-        private static void AddLugiTypes(this IImplementationTypeSelector selector)
+        private static void AddLuigiTypes(this IImplementationTypeSelector selector)
         {
             selector.AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,>)))
                 .AsImplementedInterfaces()
