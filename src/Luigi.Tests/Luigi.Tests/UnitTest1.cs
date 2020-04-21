@@ -14,13 +14,7 @@ namespace TestProject1
         public UnitTest1()
         {
             var serviceCollection = new ServiceCollection();
-
-            serviceCollection.AddTransient<IPipeline<HelloWorldRequest, string>, HelloWorldPipeline>();
-            serviceCollection.AddTransient<HelloWorldPipe>();
-            
-            serviceCollection.AddTransient<IPipeline<ShortCircuitRequest, string>, ShortCircuitPipeline>();
-            serviceCollection.AddTransient<ShortCircuitPipe>();
-            serviceCollection.AddTransient<ShortCircuitNonReachablePipe>();
+            serviceCollection.AddLuigi(GetType().Assembly);
             
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
@@ -37,21 +31,28 @@ namespace TestProject1
         [Fact]
         public async Task Should_throw_if_pipeline_not_registered()
         {
-            throw new NotImplementedException();
+            var serviceCollection = new ServiceCollection();
+            var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
+            var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
+            ex.Message.ShouldBe("No service for type 'Luigi.IPipeline`2[TestProject1.HelloWorldRequest,System.String]' has been registered.");
         }
 
         [Fact]
         public async Task Should_throw_if_pipe_not_registered()
         {
-            throw new NotImplementedException();
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddTransient<IPipeline<HelloWorldRequest, string>, HelloWorldPipeline>();
+            var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
+            var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
+            ex.Message.ShouldBe("No service for type 'TestProject1.HelloWorldPipe' has been registered.");
         }
         
         [Fact]
         public async Task Returns_response_from_PipelineContext()
         {
            var dispatcher = new Dispatcher(_serviceProvider);
-            var response = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest());
-            response.ShouldBe("Hello World");
+           var response = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest());
+           response.ShouldBe("Hello World");
         }
         
         [Fact]

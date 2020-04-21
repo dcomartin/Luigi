@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Luigi
 {
@@ -28,7 +29,7 @@ namespace Luigi
             }
 
             var pipeType = pipes.First(); 
-            var pipeObj = _serviceProvider.GetService(pipeType) as IPipe<TRequest, TResponse>;
+            var pipeObj = _serviceProvider.GetRequiredService(pipeType) as IPipe<TRequest, TResponse>;
 
             if (pipeObj == null)
             {
@@ -47,8 +48,10 @@ namespace Luigi
         public async Task<TResponse> Dispatch<TRequest, TResponse>(TRequest request)
         {
             var pipeContext = new PipelineContext<TRequest, TResponse>(request);
+            
             var builder = new PipelineBuilder<TRequest, TResponse>();
-            var pipeline = _serviceProvider.GetService(typeof(IPipeline<TRequest, TResponse>)) as IPipeline<TRequest, TResponse>;
+            
+            var pipeline = _serviceProvider.GetRequiredService(typeof(IPipeline<TRequest, TResponse>)) as IPipeline<TRequest, TResponse>;
             if (pipeline == null)
             {
                 throw new InvalidOperationException($"Pipeline does not exist for {request.GetType().FullName}");
