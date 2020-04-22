@@ -1,8 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Luigi;
 
-namespace TestProject1
+namespace Luigi.Tests
 {
     public class ShortCircuitRequest
     {

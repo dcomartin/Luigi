@@ -1,17 +1,16 @@
 using System;
 using System.Threading.Tasks;
-using Luigi;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
 
-namespace TestProject1
+namespace Luigi.Tests
 {
-    public class UnitTest1
+    public class PipelineTests
     {
         private readonly IDispatcher _dispatcher;
 
-        public UnitTest1()
+        public PipelineTests()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLuigi(GetType().Assembly);
@@ -35,7 +34,7 @@ namespace TestProject1
             var serviceCollection = new ServiceCollection();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
             var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
-            ex.Message.ShouldBe("No service for type 'Luigi.IPipeline`2[TestProject1.HelloWorldRequest,System.String]' has been registered.");
+            ex.Message.ShouldBe("No service for type 'Luigi.IPipeline`2[Luigi.Tests.HelloWorldRequest,System.String]' has been registered.");
         }
 
         [Fact]
@@ -45,7 +44,7 @@ namespace TestProject1
             serviceCollection.AddTransient<IPipeline<HelloWorldRequest, string>, HelloWorldPipeline>();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
             var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
-            ex.Message.ShouldBe("No service for type 'TestProject1.HelloWorldPipe' has been registered.");
+            ex.Message.ShouldBe("No service for type 'Luigi.Tests.HelloWorldPipe' has been registered.");
         }
         
         [Fact]
