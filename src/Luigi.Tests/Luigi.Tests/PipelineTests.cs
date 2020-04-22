@@ -60,5 +60,12 @@ namespace Luigi.Tests
             var response = await _dispatcher.Dispatch<ShortCircuitRequest, string>(new ShortCircuitRequest());
             response.ShouldBe("Short Circuit");
         }
+
+        [Fact]
+        public async Task WithContext()
+        {
+            var response = await _dispatcher.Dispatch<HelloWorldWithContextRequest, string, HelloWorldContext>(new HelloWorldWithContextRequest());
+            response.ShouldBe(new HelloWorldContext().Foo);
+        }
     }
 }

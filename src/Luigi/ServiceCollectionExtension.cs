@@ -25,12 +25,20 @@ namespace Luigi
 
         private static void AddLuigiTypes(this IImplementationTypeSelector selector)
         {
-            selector.AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,>)))
-                .AsImplementedInterfaces()
-                .WithTransientLifetime()
+            selector
+                .AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
                 .AddClasses(classes => classes.AssignableTo(typeof(IPipe<,>)))
-                .AsSelf()
-                .WithTransientLifetime();
+                    .AsSelf()
+                    .WithTransientLifetime()
+            
+                .AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,,>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(IPipe<,,>)))
+                    .AsSelf()
+                    .WithTransientLifetime();
         }
     }
 }

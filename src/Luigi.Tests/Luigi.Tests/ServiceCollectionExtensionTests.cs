@@ -40,5 +40,22 @@ namespace Luigi.Tests
             
             pipeline.ShouldNotBeNull();
         }
+        
+        [Fact]
+        public void Should_resolve_Pipeline_with_PipeContext()
+        {
+            var pipeline = _serviceProvider.GetService<IPipeline<HelloWorldWithContextRequest, string, HelloWorldContext>>();
+            
+            pipeline.ShouldNotBeNull();
+            pipeline.ShouldBeOfType<HelloWorldWithContextPipeline>();
+        }
+        
+        [Fact]
+        public void Should_resolve_Pipe_with_PipeContext()
+        {
+            var pipeline = _serviceProvider.GetService<HelloWorldWithContextPipe>();
+            
+            pipeline.ShouldNotBeNull();
+        }
     }
 }
