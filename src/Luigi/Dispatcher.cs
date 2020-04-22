@@ -5,10 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Luigi
 {
-    public interface IDispatcher
+    public interface IDispatcher 
     {
-        Task<TResponse> Dispatch<TRequest, TResponse>(TRequest request);
+        Task<TResponse> Dispatch<TRequest, TResponse>(TRequest request) where TRequest : IRequest<TResponse>;
     }
+    
+    public interface IRequest<TResponse> { }
     
     public class Dispatcher : IDispatcher
     {
@@ -45,7 +47,7 @@ namespace Luigi
             });
         }
         
-        public async Task<TResponse> Dispatch<TRequest, TResponse>(TRequest request)
+        public async Task<TResponse> Dispatch<TRequest, TResponse>(TRequest request) where TRequest : IRequest<TResponse>
         {
             var pipeContext = new PipelineContext<TRequest, TResponse>(request);
             

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Luigi.Tests
 {
-    public class ShortCircuitRequest
+    public class ShortCircuitRequest : IRequest<string>
     {
         
     }
