@@ -18,7 +18,7 @@ namespace Luigi
                 }
                 else
                 {
-                    scan.FromCallingAssembly().AddLuigiTypes();
+                    scan.FromEntryAssembly().AddLuigiTypes();
                 }
             });
         }

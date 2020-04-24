@@ -5,6 +5,7 @@
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <RootNamespace>Luigi.Tests</RootNamespace>
+        <Version>0.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Luigi\Luigi.csproj" />
+      <ProjectReference Include="..\..\src\Luigi\Luigi.csproj" />
     </ItemGroup>
 
 </Project>

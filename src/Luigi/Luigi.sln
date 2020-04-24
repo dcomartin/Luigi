@@ -2,7 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luigi", "Luigi.csproj", "{7C8C20E0-5701-4CC0-B235-2030341CEB4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luigi.Tests", "..\Luigi.Tests\Luigi.Tests\Luigi.Tests.csproj", "{21A1814E-F915-4ADF-8529-D0BAF3EB2B60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luigi.Tests", "..\..\tests\Luigi.Tests\Luigi.Tests.csproj", "{F9E30A80-8FA3-4416-9274-F56A948F0260}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{7FA8326E-D5FE-4F9D-9153-38B4B41FBAAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Luigi.Samples.Mvc", "..\..\samples\Luigi.Samples.Mvc\Luigi.Samples.Mvc.csproj", "{0112B99B-FAA2-48E8-A33C-85059B66BD06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +18,16 @@ Global
 		{7C8C20E0-5701-4CC0-B235-2030341CEB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C8C20E0-5701-4CC0-B235-2030341CEB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C8C20E0-5701-4CC0-B235-2030341CEB4D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21A1814E-F915-4ADF-8529-D0BAF3EB2B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21A1814E-F915-4ADF-8529-D0BAF3EB2B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21A1814E-F915-4ADF-8529-D0BAF3EB2B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21A1814E-F915-4ADF-8529-D0BAF3EB2B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9E30A80-8FA3-4416-9274-F56A948F0260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9E30A80-8FA3-4416-9274-F56A948F0260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9E30A80-8FA3-4416-9274-F56A948F0260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9E30A80-8FA3-4416-9274-F56A948F0260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0112B99B-FAA2-48E8-A33C-85059B66BD06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0112B99B-FAA2-48E8-A33C-85059B66BD06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0112B99B-FAA2-48E8-A33C-85059B66BD06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0112B99B-FAA2-48E8-A33C-85059B66BD06}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0112B99B-FAA2-48E8-A33C-85059B66BD06} = {7FA8326E-D5FE-4F9D-9153-38B4B41FBAAD}
 	EndGlobalSection
 EndGlobal
