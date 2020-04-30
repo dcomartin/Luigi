@@ -6,11 +6,11 @@ using Xunit;
 
 namespace Luigi.Tests
 {
-    public class PipelineTests
+    public class QueryPipelineTests
     {
         private readonly IDispatcher _dispatcher;
 
-        public PipelineTests()
+        public QueryPipelineTests()
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLuigi(GetType().Assembly);
@@ -22,8 +22,8 @@ namespace Luigi.Tests
         [Fact]
         public void AddsToPipesList()
         {
-            var pipeline = new HelloWorldPipeline();
-            var builder = new PipelineBuilder<HelloWorldRequest, string>();
+            var pipeline = new HelloWorldQueryPipeline();
+            var builder = new QueryPipelineBuilder<HelloWorldQuery, string>();
             pipeline.Configure(builder);
             builder.GetPipes().Length.ShouldBe(1);
         }
@@ -33,38 +33,38 @@ namespace Luigi.Tests
         {
             var serviceCollection = new ServiceCollection();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
-            ex.Message.ShouldBe("No service for type 'Luigi.IPipeline`2[Luigi.Tests.HelloWorldRequest,System.String]' has been registered.");
+            var ex = await dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
+            ex.Message.ShouldBe("No service for type 'Luigi.IQueryPipeline`2[Luigi.Tests.HelloWorldQuery,System.String]' has been registered.");
         }
 
         [Fact]
         public async Task Should_throw_if_pipe_not_registered()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddTransient<IPipeline<HelloWorldRequest, string>, HelloWorldPipeline>();
+            serviceCollection.AddTransient<IQueryPipeline<HelloWorldQuery, string>, HelloWorldQueryPipeline>();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest()).ShouldThrowAsync<InvalidOperationException>();
-            ex.Message.ShouldBe("No service for type 'Luigi.Tests.HelloWorldPipe' has been registered.");
+            var ex = await dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
+            ex.Message.ShouldBe($"No service for type '{typeof(HelloWorldQueryPipe).FullName}' has been registered.");
         }
         
         [Fact]
         public async Task Returns_response_from_PipelineContext()
         {
-           var response = await _dispatcher.Dispatch<HelloWorldRequest, string>(new HelloWorldRequest());
+           var response = await _dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery());
            response.ShouldBe("Hello World");
         }
         
         [Fact]
         public async Task Short_Circuit()
         { 
-            var response = await _dispatcher.Dispatch<ShortCircuitRequest, string>(new ShortCircuitRequest());
+            var response = await _dispatcher.DispatchQuery<ShortCircuitQuery, string>(new ShortCircuitQuery());
             response.ShouldBe("Short Circuit");
         }
 
         [Fact]
         public async Task WithContext()
         {
-            var response = await _dispatcher.Dispatch<HelloWorldWithContextRequest, string, HelloWorldContext>(new HelloWorldWithContextRequest());
+            var response = await _dispatcher.DispatchQuery<HelloWorldWithContextQuery, string, HelloWorldContext>(new HelloWorldWithContextQuery());
             response.ShouldBe(new HelloWorldContext().Foo);
         }
     }

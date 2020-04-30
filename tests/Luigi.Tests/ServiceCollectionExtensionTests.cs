@@ -11,7 +11,7 @@ namespace Luigi.Tests
         public ServiceCollectionExtensionTests()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddLuigi(typeof(HelloWorldPipeline).Assembly);
+            serviceCollection.AddLuigi(typeof(HelloWorldQueryPipeline).Assembly);
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
         
@@ -25,35 +25,59 @@ namespace Luigi.Tests
         }
 
         [Fact]
-        public void Should_resolve_Pipeline()
+        public void Should_resolve_QueryPipeline()
         {
-            var pipeline = _serviceProvider.GetService<IPipeline<HelloWorldRequest, string>>();
+            var pipeline = _serviceProvider.GetService<IQueryPipeline<HelloWorldQuery, string>>();
             
             pipeline.ShouldNotBeNull();
-            pipeline.ShouldBeOfType<HelloWorldPipeline>();
+            pipeline.ShouldBeOfType<HelloWorldQueryPipeline>();
+        }
+        
+        [Fact]
+        public void Should_resolve_CommandPipeline()
+        {
+            var pipeline = _serviceProvider.GetService<ICommandPipeline<DoWorkCommand>>();
+            
+            pipeline.ShouldNotBeNull();
+            pipeline.ShouldBeOfType<DoWorkCommandPipeline>();
         }
 
         [Fact]
-        public void Should_resolve_Pipe()
+        public void Should_resolve_QueryPipe()
         {
-            var pipeline = _serviceProvider.GetService<HelloWorldPipe>();
-            
-            pipeline.ShouldNotBeNull();
+            var pipe = _serviceProvider.GetService<HelloWorldQueryPipe>();
+            pipe.ShouldNotBeNull();
         }
         
         [Fact]
-        public void Should_resolve_Pipeline_with_PipeContext()
+        public void Should_resolve_CommandPipe()
         {
-            var pipeline = _serviceProvider.GetService<IPipeline<HelloWorldWithContextRequest, string, HelloWorldContext>>();
-            
-            pipeline.ShouldNotBeNull();
-            pipeline.ShouldBeOfType<HelloWorldWithContextPipeline>();
+            var pipe = _serviceProvider.GetService<DoWorkCommandPipe>();
+            pipe.ShouldNotBeNull();
         }
         
         [Fact]
-        public void Should_resolve_Pipe_with_PipeContext()
+        public void Should_resolve_QueryPipeline_with_PipeContext()
         {
-            var pipeline = _serviceProvider.GetService<HelloWorldWithContextPipe>();
+            var pipeline = _serviceProvider.GetService<IQueryPipeline<HelloWorldWithContextQuery, string, HelloWorldContext>>();
+            
+            pipeline.ShouldNotBeNull();
+            pipeline.ShouldBeOfType<HelloWorldWithContextQueryPipeline>();
+        }
+        
+        [Fact]
+        public void Should_resolve_CommandPipeline_with_PipeContext()
+        {
+            var pipeline = _serviceProvider.GetService<ICommandPipeline<DoWorkWithContextCommand, DoWorkContext>>();
+            
+            pipeline.ShouldNotBeNull();
+            pipeline.ShouldBeOfType<DoWorkWithContextCommandPipeline>();
+        }
+        
+        [Fact]
+        public void Should_resolve_QueryPipe_with_PipeContext()
+        {
+            var pipeline = _serviceProvider.GetService<HelloWorldWithContextQueryPipe>();
             
             pipeline.ShouldNotBeNull();
         }

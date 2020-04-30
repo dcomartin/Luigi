@@ -26,19 +26,67 @@ namespace Luigi
         private static void AddLuigiTypes(this IImplementationTypeSelector selector)
         {
             selector
-                .AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,>)))
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipeline<,>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipe<,>)))
+                .AsSelf()
+                .WithTransientLifetime()
+            
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipeline<,,>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipe<,,>)))
+                .AsSelf()
+                .WithTransientLifetime()
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipeline<,>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipe<,>)))
+                .AsSelf()
+                .WithTransientLifetime()
+            
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipeline<>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipe<>)))
+                .AsSelf()
+                .WithTransientLifetime();
+            
+            /*
+            selector
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipeline<,>)))
                     .AsImplementedInterfaces()
                     .WithTransientLifetime()
-                .AddClasses(classes => classes.AssignableTo(typeof(IPipe<,>)))
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipeline<,,>)))
                     .AsSelf()
                     .WithTransientLifetime()
             
-                .AddClasses(classes => classes.AssignableTo(typeof(IPipeline<,,>)))
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipe<,>)))
                     .AsImplementedInterfaces()
                     .WithTransientLifetime()
-                .AddClasses(classes => classes.AssignableTo(typeof(IPipe<,,>)))
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryPipe<,,>)))
                     .AsSelf()
-                    .WithTransientLifetime();
+                    .WithTransientLifetime()
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipeline<>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipeline<,>)))
+                    .AsSelf()
+                    .WithTransientLifetime()
+            
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipe<>)))
+                    .AsImplementedInterfaces()
+                    .WithTransientLifetime()
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipe<,>)))
+                    .AsSelf()
+                    .WithTransientLifetime();*/
         }
     }
 }
