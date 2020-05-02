@@ -47,4 +47,26 @@ namespace Luigi
             PipeContext = pipeContext;
         }
     }
+    
+    public class EventPipelineContext<TEvent>
+    {
+        public TEvent Event { get; set;  }
+        
+        public EventPipelineContext(TEvent request)
+        {
+            Event = request;
+        }
+    }
+    
+    public class EventPipelineContext<TEvent, TPipeContext>
+    {
+        public TEvent Event { get; set;  }
+        public TPipeContext PipeContext { get; set; }
+
+        public EventPipelineContext(TEvent request, TPipeContext pipeContext = default)
+        {
+            Event = request;
+            PipeContext = pipeContext;
+        }
+    }
 }

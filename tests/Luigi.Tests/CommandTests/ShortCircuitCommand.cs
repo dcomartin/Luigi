@@ -21,7 +21,7 @@ namespace Luigi.Tests
     {
         public Task Handle(CommandPipelineContext<ShortCircuitCommand> pipelineContext, Func<CommandPipelineContext<ShortCircuitCommand>, Task> next)
         {
-            DoWorkVerify.PipesCalled.Add(this.GetType());
+            PipeVerify.PipesCalled.Add(this.GetType());
             return Task.CompletedTask;
         }
     }
@@ -30,7 +30,7 @@ namespace Luigi.Tests
     {
         public Task Handle(CommandPipelineContext<ShortCircuitCommand> pipelineContext, Func<CommandPipelineContext<ShortCircuitCommand>, Task> next)
         {
-            DoWorkVerify.PipesCalled.Add(this.GetType());
+            PipeVerify.PipesCalled.Add(this.GetType());
             return next(pipelineContext);
         }
     }

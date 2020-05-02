@@ -7,14 +7,19 @@ namespace Luigi
 {
     public interface IDispatcher
     {
-        Task<TResponse> DispatchQuery<TRequest, TResponse>(TRequest request) where TRequest : IQuery<TResponse>;
-        Task<TResponse> DispatchQuery<TRequest, TResponse, TPipeContext>(TRequest request) where TRequest : IQuery<TResponse>;
-        Task DispatchCommand<TRequest>(TRequest request) where TRequest : ICommand;
-        Task DispatchCommand<TRequest, TPipeContext>(TRequest request) where TRequest : ICommand;
+        Task<TResponse> ExecuteQuery<TRequest, TResponse>(TRequest request) where TRequest : IQuery<TResponse>;
+        Task<TResponse> ExecuteQuery<TRequest, TResponse, TPipeContext>(TRequest request) where TRequest : IQuery<TResponse>;
+        
+        Task ExecuteCommand<TRequest>(TRequest request) where TRequest : ICommand;
+        Task ExecuteCommand<TRequest, TPipeContext>(TRequest request) where TRequest : ICommand;
+        
+        Task PublishEvent<TEvent>(TEvent @event) where TEvent : IEvent;
+        Task PublishEvent<TEvent, TPipeContext>(TEvent @event) where TEvent : IEvent;
     }
     
     public interface ICommand { }
     public interface IQuery<TResponse> { }
+    public interface IEvent { }
     
     public class Dispatcher : IDispatcher
     {
@@ -121,7 +126,55 @@ namespace Luigi
             });
         }
         
-        public async Task<TResponse> DispatchQuery<TRequest, TResponse>(TRequest request) where TRequest : IQuery<TResponse>
+        private async Task ExecutePipeline<TEvent>(Type[] pipes, EventPipelineContext<TEvent> context) where TEvent : IEvent
+        {
+            if (pipes.Any() == false)
+            {
+                return;
+            }
+
+            var pipeType = pipes.First(); 
+            var pipeObj = _serviceProvider.GetRequiredService(pipeType) as IEventPipe<TEvent>;
+
+            if (pipeObj == null)
+            {
+                throw new InvalidOperationException($"{pipeType.FullName} is not a valid IPipe");
+            }
+            
+            await pipeObj.Handle(context, async (p2) =>
+            {
+                if (pipes.Length > 1)
+                {
+                    await ExecutePipeline(pipes.Skip(1).ToArray(), p2);
+                }
+            });
+        }
+        
+        private async Task ExecutePipeline<TEvent, TContext>(Type[] pipes, EventPipelineContext<TEvent, TContext> context) where TEvent : IEvent
+        {
+            if (pipes.Any() == false)
+            {
+                return;
+            }
+
+            var pipeType = pipes.First(); 
+            var pipeObj = _serviceProvider.GetRequiredService(pipeType) as IEventPipe<TEvent, TContext>;
+
+            if (pipeObj == null)
+            {
+                throw new InvalidOperationException($"{pipeType.FullName} is not a valid IPipe");
+            }
+            
+            await pipeObj.Handle(context, async (p2) =>
+            {
+                if (pipes.Length > 1)
+                {
+                    await ExecutePipeline(pipes.Skip(1).ToArray(), p2);
+                }
+            });
+        }
+        
+        public async Task<TResponse> ExecuteQuery<TRequest, TResponse>(TRequest request) where TRequest : IQuery<TResponse>
         {
             var pipeContext = new QueryPipelineContext<TRequest, TResponse>(request);
             
@@ -140,7 +193,7 @@ namespace Luigi
             return pipeContext.Response;
         }
 
-        public async Task<TResponse> DispatchQuery<TRequest, TResponse, TPipeContext>(TRequest request) where TRequest : IQuery<TResponse>
+        public async Task<TResponse> ExecuteQuery<TRequest, TResponse, TPipeContext>(TRequest request) where TRequest : IQuery<TResponse>
         {
             var pipeContext = new QueryPipelineContext<TRequest, TResponse, TPipeContext>(request);
             
@@ -159,7 +212,7 @@ namespace Luigi
             return pipeContext.Response;
         }
 
-        public async Task DispatchCommand<TRequest>(TRequest request) where TRequest : ICommand
+        public async Task ExecuteCommand<TRequest>(TRequest request) where TRequest : ICommand
         {
             var pipeContext = new CommandPipelineContext<TRequest>(request);
             
@@ -176,7 +229,7 @@ namespace Luigi
             await ExecutePipeline(builder.GetPipes(), pipeContext);
         }
 
-        public async Task DispatchCommand<TRequest, TPipeContext>(TRequest request) where TRequest : ICommand
+        public async Task ExecuteCommand<TRequest, TPipeContext>(TRequest request) where TRequest : ICommand
         {
             var pipeContext = new CommandPipelineContext<TRequest, TPipeContext>(request);
             
@@ -191,6 +244,32 @@ namespace Luigi
             pipeline.Configure(builder);
             
             await ExecutePipeline(builder.GetPipes(), pipeContext);
+        }
+
+        public async Task PublishEvent<TEvent>(TEvent @event) where TEvent : IEvent
+        {
+            var pipeContext = new EventPipelineContext<TEvent>(@event);
+            
+            var pipelines = _serviceProvider.GetServices(typeof(IEventPipeline<TEvent>));
+            foreach (IEventPipeline<TEvent> pipeline in pipelines)
+            {
+                var builder = new EventPipelineBuilder<TEvent>();
+                pipeline.Configure(builder);
+                await ExecutePipeline(builder.GetPipes(), pipeContext);
+            }
+        }
+
+        public async Task PublishEvent<TEvent, TPipeContext>(TEvent @event) where TEvent : IEvent
+        {
+            var pipeContext = new EventPipelineContext<TEvent, TPipeContext>(@event);
+            
+            var pipelines = _serviceProvider.GetServices(typeof(IEventPipeline<TEvent, TPipeContext>));
+            foreach (IEventPipeline<TEvent, TPipeContext> pipeline in pipelines)
+            {
+                var builder = new EventPipelineBuilder<TEvent, TPipeContext>();
+                pipeline.Configure(builder);
+                await ExecutePipeline(builder.GetPipes(), pipeContext);
+            }
         }
     }
 }

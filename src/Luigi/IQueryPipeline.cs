@@ -19,4 +19,14 @@ namespace Luigi
     {
         void Configure(ICommandPipelineBuilder<TRequest, TPipeContext> builder);
     }
+    
+    public interface IEventPipeline<TEvent> where TEvent : IEvent
+    {
+        void Configure(IEventPipelineBuilder<TEvent> builder);
+    }
+    
+    public interface IEventPipeline<TEvent, TPipeContext> where TEvent : IEvent
+    {
+        void Configure(IEventPipelineBuilder<TEvent, TPipeContext> builder);
+    }
 }

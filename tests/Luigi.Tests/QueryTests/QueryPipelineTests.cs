@@ -33,7 +33,7 @@ namespace Luigi.Tests
         {
             var serviceCollection = new ServiceCollection();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
+            var ex = await dispatcher.ExecuteQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
             ex.Message.ShouldBe("No service for type 'Luigi.IQueryPipeline`2[Luigi.Tests.HelloWorldQuery,System.String]' has been registered.");
         }
 
@@ -43,28 +43,28 @@ namespace Luigi.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<IQueryPipeline<HelloWorldQuery, string>, HelloWorldQueryPipeline>();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
+            var ex = await dispatcher.ExecuteQuery<HelloWorldQuery, string>(new HelloWorldQuery()).ShouldThrowAsync<InvalidOperationException>();
             ex.Message.ShouldBe($"No service for type '{typeof(HelloWorldQueryPipe).FullName}' has been registered.");
         }
         
         [Fact]
         public async Task Returns_response_from_PipelineContext()
         {
-           var response = await _dispatcher.DispatchQuery<HelloWorldQuery, string>(new HelloWorldQuery());
+           var response = await _dispatcher.ExecuteQuery<HelloWorldQuery, string>(new HelloWorldQuery());
            response.ShouldBe("Hello World");
         }
         
         [Fact]
         public async Task Short_Circuit()
         { 
-            var response = await _dispatcher.DispatchQuery<ShortCircuitQuery, string>(new ShortCircuitQuery());
+            var response = await _dispatcher.ExecuteQuery<ShortCircuitQuery, string>(new ShortCircuitQuery());
             response.ShouldBe("Short Circuit");
         }
 
         [Fact]
         public async Task WithContext()
         {
-            var response = await _dispatcher.DispatchQuery<HelloWorldWithContextQuery, string, HelloWorldContext>(new HelloWorldWithContextQuery());
+            var response = await _dispatcher.ExecuteQuery<HelloWorldWithContextQuery, string, HelloWorldContext>(new HelloWorldWithContextQuery());
             response.ShouldBe(new HelloWorldContext().Foo);
         }
     }

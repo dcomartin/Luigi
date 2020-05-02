@@ -33,7 +33,7 @@ namespace Luigi.Tests
         {
             var serviceCollection = new ServiceCollection();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.DispatchCommand<DoWorkCommand>(new DoWorkCommand()).ShouldThrowAsync<InvalidOperationException>();
+            var ex = await dispatcher.ExecuteCommand<DoWorkCommand>(new DoWorkCommand()).ShouldThrowAsync<InvalidOperationException>();
             ex.Message.ShouldBe($"No service for type 'Luigi.ICommandPipeline`1[Luigi.Tests.DoWorkCommand]' has been registered.");
         }
 
@@ -43,28 +43,28 @@ namespace Luigi.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<ICommandPipeline<DoWorkCommand>, DoWorkCommandPipeline>();
             var dispatcher = new Dispatcher(serviceCollection.BuildServiceProvider());
-            var ex = await dispatcher.DispatchCommand<DoWorkCommand>(new DoWorkCommand()).ShouldThrowAsync<InvalidOperationException>();
+            var ex = await dispatcher.ExecuteCommand<DoWorkCommand>(new DoWorkCommand()).ShouldThrowAsync<InvalidOperationException>();
             ex.Message.ShouldBe($"No service for type '{typeof(DoWorkCommandPipe).FullName}' has been registered.");
         }
         
         [Fact]
         public async Task Executes_all_pipes_PipelineContext()
         {
-           await _dispatcher.DispatchCommand<DoWorkCommand>(new DoWorkCommand());
-           DoWorkVerify.PipesCalled.ShouldContain(x => x == typeof(DoWorkCommandPipe));
+           await _dispatcher.ExecuteCommand<DoWorkCommand>(new DoWorkCommand());
+           PipeVerify.PipesCalled.ShouldContain(x => x == typeof(DoWorkCommandPipe));
         }
         
         [Fact]
         public async Task Short_Circuit()
         { 
-            await _dispatcher.DispatchCommand<ShortCircuitCommand>(new ShortCircuitCommand());
-            DoWorkVerify.PipesCalled.ShouldNotContain(x => x == typeof(ShortCircuitNonReachableCommandPipe));
+            await _dispatcher.ExecuteCommand<ShortCircuitCommand>(new ShortCircuitCommand());
+            PipeVerify.PipesCalled.ShouldNotContain(x => x == typeof(ShortCircuitNonReachableCommandPipe));
         }
 
         [Fact]
         public async Task WithContext()
         {
-            await _dispatcher.DispatchCommand<DoWorkWithContextCommand, DoWorkContext>(new DoWorkWithContextCommand());
+            await _dispatcher.ExecuteCommand<DoWorkWithContextCommand, DoWorkContext>(new DoWorkWithContextCommand());
         }
     }
 }
