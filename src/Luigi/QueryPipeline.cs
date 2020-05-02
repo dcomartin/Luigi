@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 namespace Luigi
 {
+    public interface IQuery<TResponse> { }
+    
     public class QueryPipelineContext<TRequest, TResponse>
     {
         public TRequest Request { get; set;  }
@@ -58,6 +60,11 @@ namespace Luigi
         {
             return _pipes.ToArray();
         }
+    }
+
+    public interface IQueryHandler<in TQuery, TResponse> where TQuery : IQuery<TResponse>
+    {
+        Task<TResponse> Handle(TQuery query);
     }
     
     public interface IQueryPipelineBuilder<TRequest, TResponse> where TRequest : IQuery<TResponse>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,10 +17,6 @@ namespace Luigi
         Task PublishEvent<TEvent>(TEvent @event) where TEvent : IEvent;
         Task PublishEvent<TEvent, TPipeContext>(TEvent @event) where TEvent : IEvent;
     }
-    
-    public interface ICommand { }
-    public interface IQuery<TResponse> { }
-    public interface IEvent { }
     
     public class Dispatcher : IDispatcher
     {
@@ -176,6 +173,11 @@ namespace Luigi
         
         public async Task<TResponse> ExecuteQuery<TRequest, TResponse>(TRequest request) where TRequest : IQuery<TResponse>
         {
+            if (_serviceProvider.GetService(typeof(IQueryHandler<TRequest, TResponse>)) is IQueryHandler<TRequest, TResponse> handler)
+            {
+                return await handler.Handle(request);
+            }
+            
             var pipeContext = new QueryPipelineContext<TRequest, TResponse>(request);
             
             var builder = new QueryPipelineBuilder<TRequest, TResponse>();
@@ -195,8 +197,12 @@ namespace Luigi
 
         public async Task<TResponse> ExecuteQuery<TRequest, TResponse, TPipeContext>(TRequest request) where TRequest : IQuery<TResponse>
         {
-            var pipeContext = new QueryPipelineContext<TRequest, TResponse, TPipeContext>(request);
+            if (_serviceProvider.GetService(typeof(IQueryHandler<TRequest, TResponse>)) is IQueryHandler<TRequest, TResponse> handler)
+            {
+                return await handler.Handle(request);
+            }
             
+            var pipeContext = new QueryPipelineContext<TRequest, TResponse, TPipeContext>(request);
             var builder = new QueryPipelineBuilder<TRequest, TResponse, TPipeContext>();
             
             var pipeline = _serviceProvider.GetRequiredService(typeof(IQueryPipeline<TRequest, TResponse, TPipeContext>)) as IQueryPipeline<TRequest, TResponse, TPipeContext>;
@@ -214,8 +220,13 @@ namespace Luigi
 
         public async Task ExecuteCommand<TRequest>(TRequest request) where TRequest : ICommand
         {
-            var pipeContext = new CommandPipelineContext<TRequest>(request);
+            if (_serviceProvider.GetService(typeof(ICommandHandler<TRequest>)) is ICommandHandler<TRequest> handler)
+            {
+                await handler.Handle(request);
+                return;
+            }
             
+            var pipeContext = new CommandPipelineContext<TRequest>(request);
             var builder = new CommandPipelineBuilder<TRequest>();
             
             var pipeline = _serviceProvider.GetRequiredService(typeof(ICommandPipeline<TRequest>)) as ICommandPipeline<TRequest>;
@@ -231,8 +242,13 @@ namespace Luigi
 
         public async Task ExecuteCommand<TRequest, TPipeContext>(TRequest request) where TRequest : ICommand
         {
-            var pipeContext = new CommandPipelineContext<TRequest, TPipeContext>(request);
+            if (_serviceProvider.GetService(typeof(ICommandHandler<TRequest>)) is ICommandHandler<TRequest> handler)
+            {
+                await handler.Handle(request);
+                return;
+            }
             
+            var pipeContext = new CommandPipelineContext<TRequest, TPipeContext>(request);
             var builder = new CommandPipelineBuilder<TRequest, TPipeContext>();
             
             var pipeline = _serviceProvider.GetRequiredService(typeof(ICommandPipeline<TRequest, TPipeContext>)) as ICommandPipeline<TRequest, TPipeContext>;
@@ -248,6 +264,18 @@ namespace Luigi
 
         public async Task PublishEvent<TEvent>(TEvent @event) where TEvent : IEvent
         {
+            if (_serviceProvider.GetServices(typeof(IEventHandler<TEvent>)) is IEnumerable<IEventHandler<TEvent>> handlers)
+            {
+                var eventHandlers = handlers as IEventHandler<TEvent>[] ?? handlers.ToArray();
+                if (eventHandlers.Any())
+                {
+                    foreach (var handler in eventHandlers)
+                    {
+                        await handler.Handle(@event);
+                    }
+                }
+            }
+            
             var pipeContext = new EventPipelineContext<TEvent>(@event);
             
             var pipelines = _serviceProvider.GetServices(typeof(IEventPipeline<TEvent>));
@@ -261,6 +289,18 @@ namespace Luigi
 
         public async Task PublishEvent<TEvent, TPipeContext>(TEvent @event) where TEvent : IEvent
         {
+            if (_serviceProvider.GetServices(typeof(IEventHandler<TEvent>)) is IEnumerable<IEventHandler<TEvent>> handlers)
+            {
+                var eventHandlers = handlers as IEventHandler<TEvent>[] ?? handlers.ToArray();
+                if (eventHandlers.Any())
+                {
+                    foreach (var handler in eventHandlers)
+                    {
+                        await handler.Handle(@event);
+                    }
+                }
+            }
+            
             var pipeContext = new EventPipelineContext<TEvent, TPipeContext>(@event);
             
             var pipelines = _serviceProvider.GetServices(typeof(IEventPipeline<TEvent, TPipeContext>));

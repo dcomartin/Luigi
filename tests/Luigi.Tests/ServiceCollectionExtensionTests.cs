@@ -1,3 +1,4 @@
+using Luigi.Tests.EventTests;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
@@ -13,6 +14,14 @@ namespace Luigi.Tests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddLuigi(typeof(HelloWorldQueryPipeline).Assembly);
             _serviceProvider = serviceCollection.BuildServiceProvider();
+        }
+
+        [Fact]
+        public void Should_resolve_EventHandler()
+        {
+            var handler = _serviceProvider.GetServices<IEventHandler<SomethingHappened>>();
+            handler.ShouldNotBeNull();
+            handler.ShouldContain(x => x.GetType() == typeof(SomethingHappenedHandler));
         }
         
         [Fact]

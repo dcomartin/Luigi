@@ -21,7 +21,7 @@ namespace Luigi.Tests
     {
         public async Task Handle(CommandPipelineContext<DoWorkCommand> pipelineContext, Func<CommandPipelineContext<DoWorkCommand>, Task> next)
         {
-            PipeVerify.PipesCalled.Add(this.GetType());
+            PipeVerify.PipesCalled.Add(GetType());
             await next(pipelineContext);
         }
     }

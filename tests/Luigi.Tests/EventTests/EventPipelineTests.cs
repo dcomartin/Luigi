@@ -24,6 +24,7 @@ namespace Luigi.Tests.EventTests
             await _dispatcher.PublishEvent(new SomethingHappened());
             PipeVerify.PipesCalled.ShouldContain(x => x == typeof(SomethingHappenedPipe1));
             PipeVerify.PipesCalled.ShouldContain(x => x == typeof(SomethingHappenedPipe2));
+            PipeVerify.PipesCalled.ShouldContain(x => x == typeof(SomethingHappenedHandler));
         }
     }
 }

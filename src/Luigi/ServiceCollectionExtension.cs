@@ -40,6 +40,10 @@ namespace Luigi
                 .AsSelf()
                 .WithTransientLifetime()
                 
+                .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                
                 .AddClasses(classes => classes.AssignableTo(typeof(ICommandPipeline<,>)))
                 .AsImplementedInterfaces()
                 .WithTransientLifetime()
@@ -54,6 +58,10 @@ namespace Luigi
                 .AsSelf()
                 .WithTransientLifetime()
                 
+                .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime()
+                
                 .AddClasses(classes => classes.AssignableTo(typeof(IEventPipeline<,>)))
                 .AsImplementedInterfaces()
                 .WithTransientLifetime()
@@ -66,6 +74,10 @@ namespace Luigi
                 .WithTransientLifetime()
                 .AddClasses(classes => classes.AssignableTo(typeof(IEventPipe<>)))
                 .AsSelf()
+                .WithTransientLifetime()
+                
+                .AddClasses(classes => classes.AssignableTo(typeof(IEventHandler<>)))
+                .AsImplementedInterfaces()
                 .WithTransientLifetime();
             
             /*

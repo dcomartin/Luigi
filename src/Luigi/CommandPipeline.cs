@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 namespace Luigi
 {
+    public interface ICommand { }
+    
     public class CommandPipelineContext<TRequest>
     {
         public TRequest Request { get; set;  }
@@ -64,6 +66,11 @@ namespace Luigi
         {
             return _pipes.ToArray();
         }
+    }
+
+    public interface ICommandHandler<in TCommand> where TCommand : ICommand
+    {
+        Task Handle(TCommand command);
     }
     
     public interface ICommandPipeline<TRequest> where TRequest : ICommand

@@ -41,4 +41,13 @@ namespace Luigi.Tests.EventTests
             return next(context);
         }
     }
+
+    public class SomethingHappenedHandler : IEventHandler<SomethingHappened>
+    {
+        public Task Handle(SomethingHappened @event)
+        {
+            PipeVerify.PipesCalled.Add(GetType());
+            return Task.CompletedTask;
+        }
+    }
 }

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 namespace Luigi
 {
+    public interface IEvent { }
+    
     public class EventPipelineContext<TEvent>
     {
         public TEvent Event { get; set;  }
@@ -64,6 +66,11 @@ namespace Luigi
         {
             return _pipes.ToArray();
         }
+    }
+
+    public interface IEventHandler<in TEvent> where TEvent : IEvent
+    {
+        Task Handle(TEvent @event);
     }
     
     public interface IEventPipeline<TEvent> where TEvent : IEvent
