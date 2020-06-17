@@ -16,6 +16,8 @@ namespace Luigi
         
         Task PublishEvent<TEvent>(TEvent @event) where TEvent : IEvent;
         Task PublishEvent<TEvent, TPipeContext>(TEvent @event) where TEvent : IEvent;
+        Task ExecuteEventPipeline<TEvent>(TEvent @event, Type pipeline) where TEvent : IEvent;
+        Task ExecuteEventHandler<TEvent>(TEvent @event, Type handler) where TEvent : IEvent;
     }
     
     public class Dispatcher : IDispatcher
@@ -309,6 +311,33 @@ namespace Luigi
                 var builder = new EventPipelineBuilder<TEvent, TPipeContext>();
                 pipeline.Configure(builder);
                 await ExecutePipeline(builder.GetPipes(), pipeContext);
+            }
+        }
+
+        public async Task ExecuteEventPipeline<TEvent>(TEvent @event, Type pipelineType) where TEvent : IEvent
+        {
+            if (_serviceProvider.GetService(pipelineType) is IEventPipeline<TEvent> pipeline)
+            {
+                var pipeContext = new EventPipelineContext<TEvent>(@event);
+                var builder = new EventPipelineBuilder<TEvent>();
+                pipeline.Configure(builder);
+                await ExecutePipeline(builder.GetPipes(), pipeContext);
+            }
+            else
+            {
+                throw new InvalidOperationException($"{pipelineType.Name} is not of type {nameof(IEventPipeline<TEvent>)}");
+            }
+        }
+
+        public async Task ExecuteEventHandler<TEvent>(TEvent @event, Type handlerType) where TEvent : IEvent
+        {
+            if (_serviceProvider.GetService(handlerType) is IEventHandler<TEvent> eventHandler)
+            {
+                await eventHandler.Handle(@event);
+            }
+            else
+            {
+                throw new InvalidOperationException($"{handlerType.Name} is not of type {nameof(IEventHandler<TEvent>)}");
             }
         }
     }
